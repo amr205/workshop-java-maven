@@ -1,43 +1,43 @@
-# Workshop: Java sin Maven vs. con Maven
+# Workshop — rama `sin-maven`
 
-El mismo proyecto pequeño se construye dos veces:
+Compilar, probar y correr un proyecto Java **sin Maven**, solo con `javac` y `java`.
+Los comandos van para Linux/macOS (bash) y para Windows (PowerShell).
 
-- **Rama `sin-maven`**: solo con `javac`, `java` y los JAR bajados a mano.
-- **Rama `con-maven`**: con un `pom.xml` y los comandos de Maven.
+> Diferencia clave en Windows: el classpath se separa con `;` en lugar de `:`.
 
-El proyecto lee un archivo `torres.json` (las torres de un Tower Defense) con la librería **Jackson**, calcula datos del arsenal, escribe un `resumen.json` y tiene pruebas con **JUnit 5**.
+## Estructura
 
-La idea es hacer primero todo a mano para ver qué problemas resuelve Maven.
-
-## Requisitos
-
-- JDK 17 o superior (`java -version` y `javac -version`)
-- `curl` (incluido en macOS, Linux y Windows 10+; en PowerShell se escribe `curl.exe`)
-- Maven 3.9+ solo para la rama `con-maven` (`mvn -version`)
-
-## Cómo recorrer los pasos
-
-Cada paso es un commit y tiene una etiqueta (tag), así puedes saltar directo a cualquiera:
-
-| Paso | Rama `sin-maven` | Rama `con-maven` |
-| --- | --- | --- |
-| 1 | `sin-maven-paso-1`: Java puro, sin librerías | `con-maven-paso-1`: `pom.xml` mínimo |
-| 2 | `sin-maven-paso-2`: Jackson con JAR descargados a mano | `con-maven-paso-2`: Jackson como dependencia |
-| 3 | `sin-maven-paso-3`: tests con JUnit (consola) | `con-maven-paso-3`: tests con `mvn test` |
-| 4 | — | `con-maven-paso-4`: empaquetar y ejecutar con Maven |
-
-```bash
-git clone <url-de-este-repo>
-cd workshop-java-maven
-
-git checkout sin-maven          # o con-maven
-git log --oneline               # ver los pasos
-git checkout sin-maven-paso-1   # ir a un paso concreto (lee su README)
-git checkout sin-maven          # volver al final de la rama
+```
+src/main/java/com/workshop/torres/   código de la aplicación
+src/test/java/com/workshop/torres/   pruebas
 ```
 
-Para ver qué cambió de un paso a otro:
+## Paso 1 — Java puro, sin librerías
+
+Solo hay tres clases: `Torre` (un record), `Arsenal` (la lógica) y `App` (el `main`). No se usa ninguna librería externa.
+
+**Compilar** (`-d out` deja los `.class` en la carpeta `out/`):
 
 ```bash
-git diff sin-maven-paso-1 sin-maven-paso-2
+# Linux / macOS
+javac -encoding UTF-8 -d out $(find src/main/java -name "*.java")
+```
+```powershell
+# Windows PowerShell
+javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src/main/java -Filter *.java).FullName
+```
+
+**Correr** (`-cp out` le dice a la JVM dónde están las clases):
+
+```bash
+java -cp out com.workshop.torres.App
+```
+
+Salida esperada:
+
+```
+Torres: 4
+Mas poderosa: Torre[nombre=Laser, danio=50, costo=400]
+Costo total: 950
+Con 250 de oro alcanza para: [Torre[nombre=Arquero, ...], Torre[nombre=Canon, ...], Torre[nombre=Mago, ...]]
 ```
