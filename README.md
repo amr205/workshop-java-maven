@@ -1,12 +1,13 @@
-# Paso 2 (con Maven): Jackson como dependencia
+# Paso 3 (con Maven): pruebas con `mvn test`
 
-En lugar de bajar JAR a mano, se declara **una** dependencia en el `pom.xml`:
+Se agregan las mismas 7 pruebas de la otra rama y JUnit como dependencia con `scope` **test**: está disponible para compilar y correr pruebas, pero no forma parte de la aplicación.
 
 ```xml
 <dependency>
-    <groupId>com.fasterxml.jackson.core</groupId>
-    <artifactId>jackson-databind</artifactId>
-    <version>2.18.2</version>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>5.11.4</version>
+    <scope>test</scope>
 </dependency>
 ```
 
@@ -30,30 +31,22 @@ En lugar de bajar JAR a mano, se declara **una** dependencia en el `pom.xml`:
 ```bash
 git clone https://github.com/amr205/workshop-java-maven.git
 cd workshop-java-maven
-git checkout con-maven-paso-2
+git checkout con-maven-paso-3
 ```
 
-Si ya lo tienes clonado, basta con `git checkout con-maven-paso-2`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout con-maven`.
+Si ya lo tienes clonado, basta con `git checkout con-maven-paso-3`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout con-maven`.
 
-### 2. Compilar
+### 2. Ejecutar las pruebas
 
 ```bash
-mvn compile
+mvn test
 ```
 
-Maven descarga Jackson **y sus dependencias** a `~/.m2/repository` y las pone en el classpath por ti.
+Maven recorre las fases `validate → compile → test-compile → test`: compila el código, compila las pruebas y las corre con el plugin Surefire. Debe terminar con `Tests run: 7, Failures: 0` y `BUILD SUCCESS`.
 
-### 3. Ver el árbol de dependencias
+Compáralo con los pasos 2 a 5 del paso 3 de `sin-maven`: aquí es un solo comando y no hay que bajar ningún JAR.
 
-```bash
-mvn dependency:tree
-```
-
-Aparecen `jackson-core` y `jackson-annotations` debajo de `jackson-databind`: las **dependencias transitivas** que en la otra rama bajamos a mano.
-
-### 4. Correr
-
-Todavía corremos con `java`. Para eso le pedimos a Maven que copie los JAR a `target/dependency`:
+### 3. Correr la aplicación (opcional)
 
 ```bash
 mvn dependency:copy-dependencies
@@ -65,28 +58,4 @@ java -cp "target/classes:target/dependency/*" com.workshop.torres.App torres.jso
 java -cp "target/classes;target/dependency/*" com.workshop.torres.App torres.json     # Windows
 ```
 
-Salida esperada:
-
-```
-Torres leidas de torres.json: 4
-Mas poderosa: Torre[nombre=Laser, danio=50, costo=400]
-Costo total: 950
-Con 250 de oro alcanza para: [Torre[nombre=Arquero, ...], Torre[nombre=Canon, ...], Torre[nombre=Mago, ...]]
-Resumen escrito en resumen.json
-```
-
-Y se crea `resumen.json`:
-
-```json
-{
-  "cantidad" : 4,
-  "costoTotal" : 950,
-  "masPoderosa" : {
-    "nombre" : "Laser",
-    "danio" : 50,
-    "costo" : 400
-  }
-}
-```
-
-Siguiente paso: `git checkout con-maven-paso-3`.
+Siguiente paso: `git checkout con-maven-paso-4`.
