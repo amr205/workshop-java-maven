@@ -1,0 +1,6 @@
+[
+  { "nombre": "Arquero", "danio": 10, "costo": 100 },
+  { "nombre": "Canon",   "danio": 35, "costo": 250 },
+  { "nombre": "Mago",    "danio": 25, "costo": 200 },
+  { "nombre": "Laser",   "danio": 50, "costo": 400 }
+]

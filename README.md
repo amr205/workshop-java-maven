@@ -1,6 +1,14 @@
-# Paso 1 (con Maven): `pom.xml` mínimo
+# Paso 2 (con Maven): Jackson como dependencia
 
-El mismo código del paso 1 de `sin-maven`, ahora con un `pom.xml` que solo define el **GAV** (`groupId`, `artifactId`, `version`), el empaquetado y la versión de Java. Todavía no hay dependencias.
+En lugar de bajar JAR a mano, se declara **una** dependencia en el `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.18.2</version>
+</dependency>
+```
 
 | Paso | Tag | Qué agrega |
 | --- | --- | --- |
@@ -15,15 +23,6 @@ El mismo código del paso 1 de `sin-maven`, ahora con un `pom.xml` que solo defi
 - Maven 3.9 o superior: `mvn -version`
 - Git: `git --version`
 
-## Estructura (convención de Maven)
-
-```
-pom.xml                               configuración del proyecto
-src/main/java/com/workshop/torres/    código de la aplicación
-src/test/java/com/workshop/torres/    pruebas
-target/                               lo que genera Maven (no se sube a git)
-```
-
 ## Desde cero
 
 ### 1. Clonar el repo e ir a este paso
@@ -31,10 +30,10 @@ target/                               lo que genera Maven (no se sube a git)
 ```bash
 git clone https://github.com/amr205/workshop-java-maven.git
 cd workshop-java-maven
-git checkout con-maven-paso-1
+git checkout con-maven-paso-2
 ```
 
-Si ya lo tienes clonado, basta con `git checkout con-maven-paso-1`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout con-maven`.
+Si ya lo tienes clonado, basta con `git checkout con-maven-paso-2`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout con-maven`.
 
 ### 2. Compilar
 
@@ -42,21 +41,52 @@ Si ya lo tienes clonado, basta con `git checkout con-maven-paso-1`. Git va a dec
 mvn compile
 ```
 
-Maven compila `src/main/java` hacia `target/classes`: el equivalente a `javac -d out ...`. La primera vez descarga sus plugins a `~/.m2/repository`, por eso tarda más.
+Maven descarga Jackson **y sus dependencias** a `~/.m2/repository` y las pone en el classpath por ti.
 
-### 3. Correr
+### 3. Ver el árbol de dependencias
 
 ```bash
-java -cp target/classes com.workshop.torres.App
+mvn dependency:tree
+```
+
+Aparecen `jackson-core` y `jackson-annotations` debajo de `jackson-databind`: las **dependencias transitivas** que en la otra rama bajamos a mano.
+
+### 4. Correr
+
+Todavía corremos con `java`. Para eso le pedimos a Maven que copie los JAR a `target/dependency`:
+
+```bash
+mvn dependency:copy-dependencies
+```
+```bash
+java -cp "target/classes:target/dependency/*" com.workshop.torres.App torres.json     # Linux / macOS
+```
+```powershell
+java -cp "target/classes;target/dependency/*" com.workshop.torres.App torres.json     # Windows
 ```
 
 Salida esperada:
 
 ```
-Torres: 4
+Torres leidas de torres.json: 4
 Mas poderosa: Torre[nombre=Laser, danio=50, costo=400]
 Costo total: 950
 Con 250 de oro alcanza para: [Torre[nombre=Arquero, ...], Torre[nombre=Canon, ...], Torre[nombre=Mago, ...]]
+Resumen escrito en resumen.json
 ```
 
-Siguiente paso: `git checkout con-maven-paso-2`.
+Y se crea `resumen.json`:
+
+```json
+{
+  "cantidad" : 4,
+  "costoTotal" : 950,
+  "masPoderosa" : {
+    "nombre" : "Laser",
+    "danio" : 50,
+    "costo" : 400
+  }
+}
+```
+
+Siguiente paso: `git checkout con-maven-paso-3`.
