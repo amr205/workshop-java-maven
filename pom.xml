@@ -32,6 +32,8 @@
     </dependencies>
 
     <build>
+        <finalName>torres</finalName>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -46,5 +48,18 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <mainClass>com.workshop.torres.App</mainClass>
+                    <arguments>
+                        <argument>torres.json</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

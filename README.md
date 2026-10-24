@@ -70,3 +70,27 @@ mvn test
 ```
 
 Maven recorre las fases `validate → compile → test-compile → test`: compila el código, compila las pruebas y las corre con el plugin Surefire. Debe terminar con `Tests run: 7, Failures: 0` y `BUILD SUCCESS`.
+
+## Paso 4 — Empaquetar y ejecutar con Maven
+
+Se agregan dos cosas en `<build>`:
+
+- `<finalName>torres</finalName>`: el JAR se llama `target/torres.jar`.
+- `exec-maven-plugin` con la clase principal, para correr la app con un solo comando.
+
+```bash
+mvn clean package          # limpia, compila, prueba y crea target/torres.jar
+mvn exec:java              # corre App con torres.json
+mvn -DskipTests package    # empaqueta sin correr las pruebas
+```
+
+## Sin Maven vs. con Maven
+
+| Tarea | Sin Maven | Con Maven |
+| --- | --- | --- |
+| Conseguir Jackson | Bajar 3 JAR a mano | 1 dependencia en el `pom.xml` |
+| Dependencias transitivas | Investigarlas tú | Las resuelve Maven (`mvn dependency:tree`) |
+| Compilar | `javac -d out -cp ...` | `mvn compile` |
+| Pruebas | Bajar el launcher, compilar las pruebas, armar el classpath | `mvn test` |
+| Classpath `:` vs `;` | Cambia según el sistema operativo | No lo escribes |
+| Empaquetar | `jar` a mano | `mvn package` |
