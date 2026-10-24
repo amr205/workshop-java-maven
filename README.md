@@ -51,3 +51,22 @@ mvn dependency:copy-dependencies
 java -cp "target/classes:target/dependency/*" com.workshop.torres.App torres.json     # Linux / macOS
 java -cp "target/classes;target/dependency/*" com.workshop.torres.App torres.json     # Windows
 ```
+
+## Paso 3 — Pruebas con `mvn test`
+
+Se agrega JUnit con `scope` **test**: está disponible para compilar y correr las pruebas, pero no forma parte de la aplicación.
+
+```xml
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>5.11.4</version>
+    <scope>test</scope>
+</dependency>
+```
+
+```bash
+mvn test
+```
+
+Maven recorre las fases `validate → compile → test-compile → test`: compila el código, compila las pruebas y las corre con el plugin Surefire. Debe terminar con `Tests run: 7, Failures: 0` y `BUILD SUCCESS`.
