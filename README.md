@@ -1,15 +1,9 @@
-# Paso 3 (con Maven): pruebas con `mvn test`
+# Paso 4 (con Maven): empaquetar y ejecutar con Maven
 
-Se agregan las mismas 7 pruebas de la otra rama y JUnit como dependencia con `scope` **test**: está disponible para compilar y correr pruebas, pero no forma parte de la aplicación.
+Se agregan dos cosas en `<build>` del `pom.xml`:
 
-```xml
-<dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter</artifactId>
-    <version>5.11.4</version>
-    <scope>test</scope>
-</dependency>
-```
+- `<finalName>torres</finalName>`: el JAR se llama `target/torres.jar`.
+- `exec-maven-plugin` con la clase principal y el argumento `torres.json`, para correr la app con un solo comando.
 
 | Paso | Tag | Qué agrega |
 | --- | --- | --- |
@@ -31,31 +25,34 @@ Se agregan las mismas 7 pruebas de la otra rama y JUnit como dependencia con `sc
 ```bash
 git clone https://github.com/amr205/workshop-java-maven.git
 cd workshop-java-maven
-git checkout con-maven-paso-3
+git checkout con-maven-paso-4
 ```
 
-Si ya lo tienes clonado, basta con `git checkout con-maven-paso-3`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout con-maven`.
+Si ya lo tienes clonado, basta con `git checkout con-maven-paso-4`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout con-maven`.
 
-### 2. Ejecutar las pruebas
+### 2. Empaquetar
 
 ```bash
-mvn test
+mvn clean package
 ```
 
-Maven recorre las fases `validate → compile → test-compile → test`: compila el código, compila las pruebas y las corre con el plugin Surefire. Debe terminar con `Tests run: 7, Failures: 0` y `BUILD SUCCESS`.
+Limpia `target/`, compila, corre las 7 pruebas y crea `target/torres.jar`. Para empaquetar sin correr las pruebas: `mvn -DskipTests package`.
 
-Compáralo con los pasos 2 a 5 del paso 3 de `sin-maven`: aquí es un solo comando y no hay que bajar ningún JAR.
-
-### 3. Correr la aplicación (opcional)
+### 3. Correr
 
 ```bash
-mvn dependency:copy-dependencies
-```
-```bash
-java -cp "target/classes:target/dependency/*" com.workshop.torres.App torres.json     # Linux / macOS
-```
-```powershell
-java -cp "target/classes;target/dependency/*" com.workshop.torres.App torres.json     # Windows
+mvn exec:java
 ```
 
-Siguiente paso: `git checkout con-maven-paso-4`.
+Imprime las torres y escribe `resumen.json`, sin escribir ningún classpath.
+
+## Sin Maven vs. con Maven
+
+| Tarea | Sin Maven | Con Maven |
+| --- | --- | --- |
+| Conseguir Jackson | Bajar 3 JAR a mano | 1 dependencia en el `pom.xml` |
+| Dependencias transitivas | Investigarlas tú | Las resuelve Maven (`mvn dependency:tree`) |
+| Compilar | `javac -d out -cp ...` | `mvn compile` |
+| Pruebas | Bajar el launcher, compilar las pruebas y armar el classpath | `mvn test` |
+| Classpath `:` vs `;` | Cambia según el sistema operativo | No lo escribes |
+| Empaquetar y correr | `jar` y `java -cp ...` a mano | `mvn package` y `mvn exec:java` |
