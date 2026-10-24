@@ -1,6 +1,6 @@
-# Paso 2 (sin Maven): Jackson descargando los JAR a mano
+# Paso 3 (sin Maven): pruebas con JUnit 5 desde la consola
 
-Las torres ahora vienen de `torres.json`. La clase nueva `LectorTorres` usa **Jackson** para leerlo y para escribir un `resumen.json`.
+Se agregan las pruebas en `src/test/java`: `ArsenalTest` (4 pruebas) y `LectorTorresTest` (3 pruebas). Usan el patrón Arrange / Act / Assert.
 
 | Paso | Tag | Qué agrega |
 | --- | --- | --- |
@@ -21,10 +21,10 @@ Las torres ahora vienen de `torres.json`. La clase nueva `LectorTorres` usa **Ja
 ```bash
 git clone https://github.com/amr205/workshop-java-maven.git
 cd workshop-java-maven
-git checkout sin-maven-paso-2
+git checkout sin-maven-paso-3
 ```
 
-Si ya lo tienes clonado, basta con `git checkout sin-maven-paso-2`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout sin-maven`.
+Si ya lo tienes clonado, basta con `git checkout sin-maven-paso-3`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout sin-maven`.
 
 ### 2. Descargar Jackson a `lib/`
 
@@ -49,17 +49,48 @@ foreach ($a in "jackson-databind","jackson-core","jackson-annotations") {
 
 `lib/` está en el `.gitignore`: los JAR no se suben al repo.
 
-### 3. Compilar
+Además, el **JUnit Console Launcher**: un solo JAR que trae JUnit Jupiter y el motor para correr las pruebas.
 
-Ahora `javac` necesita los JAR de Jackson en el classpath (`-cp "lib/*"` toma todos los JAR de la carpeta):
+```bash
+# Linux / macOS
+curl -L -o lib/junit-platform-console-standalone-1.11.4.jar https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar
+```
+```powershell
+# Windows PowerShell
+curl.exe -L -o lib/junit-platform-console-standalone-1.11.4.jar https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar
+```
+
+Revisa con `ls lib` (o `dir lib`) que estén los 4 archivos y que ninguno pese casi nada.
+
+### 3. Compilar el código
 
 ```bash
 javac -d out -cp "lib/*" src/main/java/com/workshop/torres/*.java
 ```
 
-### 4. Correr
+### 4. Compilar las pruebas
 
-El classpath lleva tus clases **y** los JAR. En Windows se separan con `;` y en Linux/macOS con `:`.
+Las pruebas necesitan las clases de `out/` y los JAR (JUnit y Jackson):
+
+```bash
+javac -d out-test -cp "out:lib/*" src/test/java/com/workshop/torres/*.java      # Linux / macOS
+```
+```powershell
+javac -d out-test -cp "out;lib/*" src/test/java/com/workshop/torres/*.java      # Windows
+```
+
+### 5. Ejecutar las pruebas
+
+```bash
+java -cp "out:out-test:lib/*" org.junit.platform.console.ConsoleLauncher execute --scan-class-path      # Linux / macOS
+```
+```powershell
+java -cp "out;out-test;lib/*" org.junit.platform.console.ConsoleLauncher execute --scan-class-path      # Windows
+```
+
+Al final debe decir `7 tests successful` y `0 tests failed`.
+
+### 6. Correr la aplicación (opcional)
 
 ```bash
 java -cp "out:lib/*" com.workshop.torres.App torres.json      # Linux / macOS
@@ -68,33 +99,12 @@ java -cp "out:lib/*" com.workshop.torres.App torres.json      # Linux / macOS
 java -cp "out;lib/*" com.workshop.torres.App torres.json      # Windows
 ```
 
-Salida esperada:
+## Lo que tuvimos que hacer a mano
 
-```
-Torres leidas de torres.json: 4
-Mas poderosa: Torre[nombre=Laser, danio=50, costo=400]
-Costo total: 950
-Con 250 de oro alcanza para: [Torre[nombre=Arquero, ...], Torre[nombre=Canon, ...], Torre[nombre=Mago, ...]]
-Resumen escrito en resumen.json
-```
+1. Averiguar qué JAR necesita Jackson y en qué versión, incluidas sus dependencias transitivas.
+2. Descargar cada JAR y guardarlo en `lib/`.
+3. Armar el classpath en cada comando, con `:` o `;` según el sistema operativo.
+4. Compilar el código y las pruebas por separado, en el orden correcto.
+5. Bajar y ejecutar a mano el launcher de JUnit.
 
-Y se crea `resumen.json`:
-
-```json
-{
-  "cantidad" : 4,
-  "costoTotal" : 950,
-  "masPoderosa" : {
-    "nombre" : "Laser",
-    "danio" : 50,
-    "costo" : 400
-  }
-}
-```
-
-## Prueba esto
-
-1. Compila **sin** `-cp "lib/*"`: `javac` falla con `package com.fasterxml.jackson.databind does not exist`.
-2. Borra `lib/jackson-core-2.18.2.jar` y vuelve a compilar o correr: así se ve una dependencia transitiva que falta.
-
-Siguiente paso: `git checkout sin-maven-paso-3`.
+Todo esto lo automatiza Maven: compara con la rama `con-maven` (`git checkout con-maven-paso-1`).
