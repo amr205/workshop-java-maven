@@ -1,19 +1,24 @@
 package com.workshop.torres;
 
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class App {
 
-    public static void main(String[] args) {
-        Arsenal arsenal = new Arsenal(List.of(
-                new Torre("Arquero", 10, 100),
-                new Torre("Canon", 35, 250),
-                new Torre("Mago", 25, 200),
-                new Torre("Laser", 50, 400)));
+    public static void main(String[] args) throws IOException {
+        Path entrada = Path.of(args.length > 0 ? args[0] : "torres.json");
+        Path salida = Path.of(args.length > 1 ? args[1] : "resumen.json");
 
-        System.out.println("Torres: " + arsenal.getTorres().size());
+        LectorTorres lector = new LectorTorres();
+        Arsenal arsenal = lector.leerArchivo(entrada);
+
+        System.out.println("Torres leidas de " + entrada + ": " + arsenal.getTorres().size());
         System.out.println("Mas poderosa: " + arsenal.masPoderosa());
         System.out.println("Costo total: " + arsenal.costoTotal());
         System.out.println("Con 250 de oro alcanza para: " + arsenal.alcanzables(250));
+
+        Files.writeString(salida, lector.resumenJson(arsenal));
+        System.out.println("Resumen escrito en " + salida);
     }
 }
