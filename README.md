@@ -104,3 +104,53 @@ Se genera `resumen.json`:
 ```
 
 **Prueba esto:** borra `lib/jackson-core-2.18.2.jar` y vuelve a compilar o a correr. Vas a ver un error de compilación o un `NoClassDefFoundError`: así se ve una dependencia transitiva que falta.
+
+## Paso 3 — Pruebas con JUnit 5, sin Maven
+
+Las pruebas están en `src/test/java`: `ArsenalTest` y `LectorTorresTest`. Usan el patrón Arrange / Act / Assert.
+
+Para correrlas sin Maven se usa el **JUnit Console Launcher**, un solo JAR que trae JUnit Jupiter y el motor de pruebas.
+
+**Descargar el launcher:**
+
+```bash
+curl -L -o lib/junit-platform-console-standalone-1.11.4.jar \
+  https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar
+```
+```powershell
+curl.exe -L -o lib/junit-platform-console-standalone-1.11.4.jar https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar
+```
+
+**Compilar el código y luego las pruebas** (las pruebas necesitan las clases de `out/` y los JAR):
+
+```bash
+# Linux / macOS
+javac -encoding UTF-8 -d out -cp "lib/*" $(find src/main/java -name "*.java")
+javac -encoding UTF-8 -d out-test -cp "out:lib/*" $(find src/test/java -name "*.java")
+```
+```powershell
+# Windows PowerShell
+javac -encoding UTF-8 -d out -cp "lib/*" (Get-ChildItem -Recurse src/main/java -Filter *.java).FullName
+javac -encoding UTF-8 -d out-test -cp "out;lib/*" (Get-ChildItem -Recurse src/test/java -Filter *.java).FullName
+```
+
+**Ejecutar las pruebas:**
+
+```bash
+java -cp "out:out-test:lib/*" org.junit.platform.console.ConsoleLauncher execute --scan-class-path      # Linux / macOS
+```
+```powershell
+java -cp "out;out-test;lib/*" org.junit.platform.console.ConsoleLauncher execute --scan-class-path      # Windows
+```
+
+Al final debe decir `7 tests successful` y `0 tests failed`.
+
+## Lo que tuvimos que hacer a mano
+
+1. Buscar qué JAR necesita Jackson y en qué versión, incluidas sus dependencias transitivas.
+2. Descargar cada JAR y guardarlo en `lib/` (sin subirlo a git).
+3. Armar el classpath en cada comando, con `:` o `;` según el sistema operativo.
+4. Compilar el código y las pruebas por separado, en el orden correcto.
+5. Bajar y ejecutar a mano el launcher de JUnit.
+
+Todo esto es lo que automatiza Maven: compara con la rama `con-maven`.
