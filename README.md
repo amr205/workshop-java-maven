@@ -1,43 +1,26 @@
-# Workshop: Java sin Maven vs. con Maven
+# Workshop — rama `con-maven`
 
-El mismo proyecto pequeño se construye dos veces:
+El mismo proyecto de la rama `sin-maven`, ahora con **Maven**. Los comandos de Maven son iguales en Linux, macOS y Windows.
 
-- **Rama `sin-maven`**: solo con `javac`, `java` y los JAR bajados a mano.
-- **Rama `con-maven`**: con un `pom.xml` y los comandos de Maven.
+## Estructura (convención de Maven)
 
-El proyecto lee un archivo `torres.json` (las torres de un Tower Defense) con la librería **Jackson**, calcula datos del arsenal, escribe un `resumen.json` y tiene pruebas con **JUnit 5**.
-
-La idea es hacer primero todo a mano para ver qué problemas resuelve Maven.
-
-## Requisitos
-
-- JDK 17 o superior (`java -version` y `javac -version`)
-- `curl` (incluido en macOS, Linux y Windows 10+; en PowerShell se escribe `curl.exe`)
-- Maven 3.9+ solo para la rama `con-maven` (`mvn -version`)
-
-## Cómo recorrer los pasos
-
-Cada paso es un commit y tiene una etiqueta (tag), así puedes saltar directo a cualquiera:
-
-| Paso | Rama `sin-maven` | Rama `con-maven` |
-| --- | --- | --- |
-| 1 | `sin-maven-paso-1`: Java puro, sin librerías | `con-maven-paso-1`: `pom.xml` mínimo |
-| 2 | `sin-maven-paso-2`: Jackson con JAR descargados a mano | `con-maven-paso-2`: Jackson como dependencia |
-| 3 | `sin-maven-paso-3`: tests con JUnit (consola) | `con-maven-paso-3`: tests con `mvn test` |
-| 4 | — | `con-maven-paso-4`: empaquetar y ejecutar con Maven |
-
-```bash
-git clone <url-de-este-repo>
-cd workshop-java-maven
-
-git checkout sin-maven          # o con-maven
-git log --oneline               # ver los pasos
-git checkout sin-maven-paso-1   # ir a un paso concreto (lee su README)
-git checkout sin-maven          # volver al final de la rama
+```
+pom.xml                               configuración del proyecto
+src/main/java/com/workshop/torres/    código de la aplicación
+src/test/java/com/workshop/torres/    pruebas
+target/                               lo que genera Maven (no se sube a git)
 ```
 
-Para ver qué cambió de un paso a otro:
+## Paso 1 — `pom.xml` mínimo
+
+El `pom.xml` solo define el **GAV** (`groupId`, `artifactId`, `version`), el empaquetado y la versión de Java. Aún no hay dependencias.
 
 ```bash
-git diff sin-maven-paso-1 sin-maven-paso-2
+mvn compile
+```
+
+Maven compila `src/main/java` hacia `target/classes`, el equivalente a nuestro `javac -d out ...`. Para correr:
+
+```bash
+java -cp target/classes com.workshop.torres.App
 ```
