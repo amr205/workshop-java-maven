@@ -1,43 +1,62 @@
-# Workshop: Java sin Maven vs. con Maven
+# Paso 1 (con Maven): `pom.xml` mínimo
 
-El mismo proyecto pequeño se construye dos veces:
+El mismo código del paso 1 de `sin-maven`, ahora con un `pom.xml` que solo define el **GAV** (`groupId`, `artifactId`, `version`), el empaquetado y la versión de Java. Todavía no hay dependencias.
 
-- **Rama `sin-maven`**: solo con `javac`, `java` y los JAR bajados a mano.
-- **Rama `con-maven`**: con un `pom.xml` y los comandos de Maven.
-
-El proyecto lee un archivo `torres.json` (las torres de un Tower Defense) con la librería **Jackson**, calcula datos del arsenal, escribe un `resumen.json` y tiene pruebas con **JUnit 5**.
-
-La idea es hacer primero todo a mano para ver qué problemas resuelve Maven.
+| Paso | Tag | Qué agrega |
+| --- | --- | --- |
+| 1 | `con-maven-paso-1` | `pom.xml` mínimo |
+| 2 | `con-maven-paso-2` | Jackson como dependencia |
+| 3 | `con-maven-paso-3` | Pruebas con `mvn test` |
+| 4 | `con-maven-paso-4` | Empaquetar y ejecutar con Maven |
 
 ## Requisitos
 
-- JDK 17 o superior (`java -version` y `javac -version`)
-- `curl` (incluido en macOS, Linux y Windows 10+; en PowerShell se escribe `curl.exe`)
-- Maven 3.9+ solo para la rama `con-maven` (`mvn -version`)
+- JDK 17 o superior: `java -version`
+- Maven 3.9 o superior: `mvn -version`
+- Git: `git --version`
 
-## Cómo recorrer los pasos
+## Estructura (convención de Maven)
 
-Cada paso es un commit y tiene una etiqueta (tag), así puedes saltar directo a cualquiera:
+```
+pom.xml                               configuración del proyecto
+src/main/java/com/workshop/torres/    código de la aplicación
+src/test/java/com/workshop/torres/    pruebas
+target/                               lo que genera Maven (no se sube a git)
+```
 
-| Paso | Rama `sin-maven` | Rama `con-maven` |
-| --- | --- | --- |
-| 1 | `sin-maven-paso-1`: Java puro, sin librerías | `con-maven-paso-1`: `pom.xml` mínimo |
-| 2 | `sin-maven-paso-2`: Jackson con JAR descargados a mano | `con-maven-paso-2`: Jackson como dependencia |
-| 3 | `sin-maven-paso-3`: tests con JUnit (consola) | `con-maven-paso-3`: tests con `mvn test` |
-| 4 | — | `con-maven-paso-4`: empaquetar y ejecutar con Maven |
+## Desde cero
+
+### 1. Clonar el repo e ir a este paso
 
 ```bash
-git clone <url-de-este-repo>
+git clone https://github.com/amr205/workshop-java-maven.git
 cd workshop-java-maven
-
-git checkout sin-maven          # o con-maven
-git log --oneline               # ver los pasos
-git checkout sin-maven-paso-1   # ir a un paso concreto (lee su README)
-git checkout sin-maven          # volver al final de la rama
+git checkout con-maven-paso-1
 ```
 
-Para ver qué cambió de un paso a otro:
+Si ya lo tienes clonado, basta con `git checkout con-maven-paso-1`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout con-maven`.
+
+### 2. Compilar
 
 ```bash
-git diff sin-maven-paso-1 sin-maven-paso-2
+mvn compile
 ```
+
+Maven compila `src/main/java` hacia `target/classes`: el equivalente a `javac -d out ...`. La primera vez descarga sus plugins a `~/.m2/repository`, por eso tarda más.
+
+### 3. Correr
+
+```bash
+java -cp target/classes com.workshop.torres.App
+```
+
+Salida esperada:
+
+```
+Torres: 4
+Mas poderosa: Torre[nombre=Laser, danio=50, costo=400]
+Costo total: 950
+Con 250 de oro alcanza para: [Torre[nombre=Arquero, ...], Torre[nombre=Canon, ...], Torre[nombre=Mago, ...]]
+```
+
+Siguiente paso: `git checkout con-maven-paso-2`.
