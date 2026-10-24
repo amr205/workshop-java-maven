@@ -1,0 +1,11 @@
+out/
+out-test/
+lib/
+target/
+resumen.json
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
