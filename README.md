@@ -1,43 +1,56 @@
-# Workshop: Java sin Maven vs. con Maven
+# Paso 1 (sin Maven): Java puro, sin librerías
 
-El mismo proyecto pequeño se construye dos veces:
+Tres clases: `Torre` (un record), `Arsenal` (la lógica) y `App` (el `main`). No se usa ninguna librería externa, así que basta con `javac` y `java`.
 
-- **Rama `sin-maven`**: solo con `javac`, `java` y los JAR bajados a mano.
-- **Rama `con-maven`**: con un `pom.xml` y los comandos de Maven.
-
-El proyecto lee un archivo `torres.json` (las torres de un Tower Defense) con la librería **Jackson**, calcula datos del arsenal, escribe un `resumen.json` y tiene pruebas con **JUnit 5**.
-
-La idea es hacer primero todo a mano para ver qué problemas resuelve Maven.
+| Paso | Tag | Qué agrega |
+| --- | --- | --- |
+| 1 | `sin-maven-paso-1` | Java puro, sin librerías |
+| 2 | `sin-maven-paso-2` | Jackson con JAR descargados a mano |
+| 3 | `sin-maven-paso-3` | Pruebas con JUnit 5 desde la consola |
 
 ## Requisitos
 
-- JDK 17 o superior (`java -version` y `javac -version`)
-- `curl` (incluido en macOS, Linux y Windows 10+; en PowerShell se escribe `curl.exe`)
-- Maven 3.9+ solo para la rama `con-maven` (`mvn -version`)
+- JDK 17 o superior: `java -version` y `javac -version`
+- Git: `git --version`
 
-## Cómo recorrer los pasos
+## Desde cero
 
-Cada paso es un commit y tiene una etiqueta (tag), así puedes saltar directo a cualquiera:
-
-| Paso | Rama `sin-maven` | Rama `con-maven` |
-| --- | --- | --- |
-| 1 | `sin-maven-paso-1`: Java puro, sin librerías | `con-maven-paso-1`: `pom.xml` mínimo |
-| 2 | `sin-maven-paso-2`: Jackson con JAR descargados a mano | `con-maven-paso-2`: Jackson como dependencia |
-| 3 | `sin-maven-paso-3`: tests con JUnit (consola) | `con-maven-paso-3`: tests con `mvn test` |
-| 4 | — | `con-maven-paso-4`: empaquetar y ejecutar con Maven |
+### 1. Clonar el repo e ir a este paso
 
 ```bash
-git clone <url-de-este-repo>
+git clone https://github.com/amr205/workshop-java-maven.git
 cd workshop-java-maven
-
-git checkout sin-maven          # o con-maven
-git log --oneline               # ver los pasos
-git checkout sin-maven-paso-1   # ir a un paso concreto (lee su README)
-git checkout sin-maven          # volver al final de la rama
+git checkout sin-maven-paso-1
 ```
 
-Para ver qué cambió de un paso a otro:
+Si ya lo tienes clonado, basta con `git checkout sin-maven-paso-1`. Git va a decir que estás en *detached HEAD*: es normal, solo estás viendo este commit. Para volver al final de la rama usa `git checkout sin-maven`.
+
+### 2. Compilar
+
+`-d out` deja los `.class` en la carpeta `out/`. El comando es igual en Linux, macOS y Windows (PowerShell o CMD):
 
 ```bash
-git diff sin-maven-paso-1 sin-maven-paso-2
+javac -d out src/main/java/com/workshop/torres/*.java
 ```
+
+### 3. Correr
+
+`-cp out` le dice a la JVM dónde están las clases compiladas:
+
+```bash
+java -cp out com.workshop.torres.App
+```
+
+Salida esperada:
+
+```
+Torres: 4
+Mas poderosa: Torre[nombre=Laser, danio=50, costo=400]
+Costo total: 950
+Con 250 de oro alcanza para: [Torre[nombre=Arquero, ...], Torre[nombre=Canon, ...], Torre[nombre=Mago, ...]]
+```
+
+## Notas
+
+- El comodín `*.java` funciona porque todas las clases están en la misma carpeta. Con varios paquetes habría que listar cada carpeta o usar `find` / `Get-ChildItem`.
+- Siguiente paso: `git checkout sin-maven-paso-2`.
