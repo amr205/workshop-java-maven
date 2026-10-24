@@ -24,3 +24,30 @@ Maven compila `src/main/java` hacia `target/classes`, el equivalente a nuestro `
 ```bash
 java -cp target/classes com.workshop.torres.App
 ```
+
+## Paso 2 — Jackson como dependencia
+
+En lugar de bajar JAR, se declara **una** dependencia en el `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.18.2</version>
+</dependency>
+```
+
+```bash
+mvn compile
+mvn dependency:tree
+```
+
+`dependency:tree` muestra que Maven trajo solo `jackson-core` y `jackson-annotations`: las **dependencias transitivas** que en la otra rama bajamos a mano. Quedan en tu repositorio local `~/.m2/repository`.
+
+Para correr todavía usamos `java`, pidiéndole a Maven que copie los JAR a `target/dependency`:
+
+```bash
+mvn dependency:copy-dependencies
+java -cp "target/classes:target/dependency/*" com.workshop.torres.App torres.json     # Linux / macOS
+java -cp "target/classes;target/dependency/*" com.workshop.torres.App torres.json     # Windows
+```
